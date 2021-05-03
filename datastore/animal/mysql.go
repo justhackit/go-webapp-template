@@ -6,15 +6,15 @@ import (
 	"github.com/justhackit/go-webapp-template/entities"
 )
 
-type AnimalStorer struct {
+type AnimalDAO struct {
 	db *sql.DB
 }
 
-func New(db *sql.DB) AnimalStorer {
-	return AnimalStorer{db: db}
+func New(db *sql.DB) AnimalDAO {
+	return AnimalDAO{db: db}
 }
 
-func (a AnimalStorer) Get(id int) ([]entities.Animal, error) {
+func (a AnimalDAO) Get(id int) ([]entities.Animal, error) {
 	var (
 		rows *sql.Rows
 		err  error
@@ -42,7 +42,7 @@ func (a AnimalStorer) Get(id int) ([]entities.Animal, error) {
 	return animals, nil
 }
 
-func (a AnimalStorer) Create(animal entities.Animal) (entities.Animal, error) {
+func (a AnimalDAO) Create(animal entities.Animal) (entities.Animal, error) {
 	res, err := a.db.Exec("INSERT INTO animals (name,age) VALUES(?,?)", animal.Name, animal.Age)
 	if err != nil {
 		return entities.Animal{}, err

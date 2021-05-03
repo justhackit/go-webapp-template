@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/justhackit/go-webapp-template/driver"
 	"github.com/justhackit/go-webapp-template/entities"
 )
@@ -36,7 +37,7 @@ func TestDatastore(t *testing.T) {
 
 }
 
-func testAnimalStorer_Create(t *testing.T, db AnimalStorer) {
+func testAnimalStorer_Create(t *testing.T, db AnimalDAO) {
 	testcases := []struct {
 		req      entities.Animal
 		response entities.Animal
@@ -53,7 +54,25 @@ func testAnimalStorer_Create(t *testing.T, db AnimalStorer) {
 	}
 }
 
-func testAnimalStorer_Get(t *testing.T, db AnimalStorer) {
+func TestAnimalStorer_CreateMock(t *testing.T) {
+	dbConn, mock, _ := sqlmock.New()
+	db := New(dbConn)
+	testcase := entities.Animal{Name: "Peppa Pig", Age: 2}
+
+	mock.ExpectExec("INSERT INTO animal").WithArgs("Peppa Pig", 2).WillReturnResult(sqlmock.NewResult(0, 0))
+
+	_, err := db.Create(testcase)
+	if err != nil {
+		t.Errorf("Test Failed. Error occured : %v\n", err)
+	}
+
+	if err := mock.ExpectationsWereMet(); err != nil {
+		t.Errorf("Expectations were NOT met : %v", err)
+	}
+
+}
+
+func testAnimalStorer_Get(t *testing.T, db AnimalDAO) {
 	testcases := []struct {
 		id   int
 		resp []entities.Animal
